@@ -27,31 +27,31 @@ with open('test.csv', encoding='utf-8') as r_file:
           
     for row in reader:
         if rows_read >= rows_to_skip:            
-           sliced_time_str = time_slicing(row[0]) 
-           
-               
-                   
+           sliced_time_str = time_slicing(row[0])    
+           time = str_to_datetime(sliced_time_str)                   
            person = row[1] + " " + row[2]
            address = row[3]
            company = row[4]
-           buffer_dict = {
-               #'entry_time':entry_time,
-               #'exit_time':exit_time, 
+           if 'vhod' in address:
+               buffer_dict = {'entry_time':time}
+           elif 'vyhod' in address:
+               buffer_dict = {'exit_time':time}
+
+           buffer_dict = {               
                'person':person, 
                'address': address, 
                'company':company
             }              
-           time = str_to_datetime(sliced_time_str)
             
            
-           if person in data:
-               if time < data.get(person).get('buffer_dict').get('entry_time'):
-                    data[person]['buffer_dict']['entry_time'] = time                                  
-               elif time > data[person]['buffer_dict']['exit_time']:
-                    data[person]['buffer_dict']['exit_time'] = time 
-           else:
-                #data[person]['buffer_dict'].append(buffer_dict)
-                data[person] = {'buffer_dict':[buffer_dict]}   
+           if person in data:               
+               if data[person]['entry_time'] > time:
+                   data[person]['entry_time'] = time 
+                     
+               else:
+                   data[person]['exit_time'] = time 
+           else:                
+               data = {buffer_dict}   
 
             
         rows_read += 1
