@@ -1,8 +1,8 @@
 import csv
 import json
-from datetime import datetime as dt
+import datetime
 
-data = {}       # Основное хранилище
+data = []      # Основное хранилище
 
 rows_to_skip = 1   # Переменные для пропуска первой строки в csv файле
 rows_read = 0      #
@@ -13,13 +13,13 @@ def time_slicing(end_date):
 
 #Преобразывываем обрезанную строку в формат datetime
 def str_to_datetime(sliced_str):
-    return dt.strptime(sliced_str, "%d.%m.%Y %H:%M:%S")
-
-#def comparingTime(time_str, person):
-#    for time_str in data:
- #       if data[person]
+    return datetime.datetime.strptime(sliced_str, "%d.%m.%Y %H:%M:%S")
 
 
+def search(name):
+    for p in data:
+        if p['person'] == person:
+            return p['person']
 
 #Считываем данные из csv файла в структуру dict 
 with open('test.csv', encoding='utf-8') as r_file:
@@ -33,31 +33,34 @@ with open('test.csv', encoding='utf-8') as r_file:
            address = row[3]
            company = row[4]
            if 'vhod' in address:
-               buffer_dict = {'entry_time':time}
+               entry_time = time
+               exit_time = datetime.datetime.min
            elif 'vyhod' in address:
-               buffer_dict = {'exit_time':time}
-
-           buffer_dict = {               
-               'person':person, 
-               'address': address, 
-               'company':company
-            }              
+               entry_time = datetime.datetime.max
+               exit_time = time
+           buffer_dict = {
+               'person' : person, 
+               'entry_time': entry_time,
+               'exit_time': exit_time                   
+             
+           }
+              
             
-           
-           if person in data:               
-               if data[person]['entry_time'] > time:
-                   data[person]['entry_time'] = time 
-                     
-               else:
-                   data[person]['exit_time'] = time 
+           if person == search(person):  
+               for index in data:
+                   if time < index['entry_time']:                  
+                      index['entry_time'] = time                      
+                   elif time > index['exit_time']:
+                      index['exit_time'] = time 
            else:                
-               data = {buffer_dict}   
-
-            
+               data.append(buffer_dict)          
+                      
         rows_read += 1
     # Как настоящий джентльмен, не допускаем утечек
     r_file.close()
-print(data)
+for p in data:
+    print(p)
+
 """
 for person in data:
     x = data.get(person)
